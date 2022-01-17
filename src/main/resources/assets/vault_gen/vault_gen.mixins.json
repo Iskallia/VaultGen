@@ -6,7 +6,10 @@
     "refmap": "vault_gen.refmap.json",
     "mixins": [
         "MixinBiome",
-        "MixinStructureStart"
+        "MixinStructureStart",
+        "MixinOverworldBiomeProvider",
+        "MixinLazyAreaLayerContext",
+        "MixinBiomeLayer"
     ],
     "client": [],
     "server": [],

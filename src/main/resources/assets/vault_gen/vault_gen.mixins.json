@@ -1,0 +1,17 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "iskallia.vaultgen.mixin",
+    "compatibilityLevel": "JAVA_8",
+    "refmap": "vault_gen.refmap.json",
+    "mixins": [
+        "MixinBiome",
+        "MixinStructureStart"
+    ],
+    "client": [],
+    "server": [],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
+

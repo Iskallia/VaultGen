@@ -1,7 +1,10 @@
 package iskallia.vaultgen.mixin;
 
+import iskallia.vaultgen.config.ModGenConfig;
 import iskallia.vaultgen.init.ModConfigs;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.MutableRegistry;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -19,8 +22,9 @@ public abstract class MixinBiome {
 	@Redirect(method = "generateFeatures", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/gen/feature/ConfiguredFeature;func_242765_a(Lnet/minecraft/world/ISeedReader;Lnet/minecraft/world/gen/ChunkGenerator;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;)Z"))
     public boolean generateDecorators(ConfiguredFeature<?, ?> feature, ISeedReader reader, ChunkGenerator chunkGen, Random random, BlockPos pos) {
 		ServerWorld world = reader.getWorld();
+		MutableRegistry<ConfiguredFeature<?, ?>> registry = reader.getWorld().func_241828_r().getRegistry(Registry.CONFIGURED_FEATURE_KEY);
 
-		if(!ModConfigs.MOD_GEN.isValid(world.getDimensionKey().getLocation(), feature.feature.getRegistryName())) {
+		if(!ModConfigs.MOD_GEN.isValid(ModGenConfig.Type.DECORATORS, world.getDimensionKey(), registry.getKey(feature))) {
 			return false;
 		}
 

@@ -1,5 +1,6 @@
 package iskallia.vaultgen.mixin;
 
+import iskallia.vaultgen.config.ModGenConfig;
 import iskallia.vaultgen.init.ModConfigs;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -24,10 +25,10 @@ public abstract class MixinStructureStart {
 
 	@Inject(method = "func_230366_a_", at = @At("HEAD"), cancellable = true)
 	public void func_230366_a_(ISeedReader reader, StructureManager manager, ChunkGenerator chunkGen,
-	                           Random random, MutableBoundingBox aabb, ChunkPos chunkPos, CallbackInfo ci) {
+	                           Random random, MutableBoundingBox box, ChunkPos chunkPos, CallbackInfo ci) {
 		ServerWorld world = reader.getWorld();
 
-		if(!ModConfigs.MOD_GEN.isValid(world.getDimensionKey().getLocation(), this.getStructure().getRegistryName())) {
+		if(!ModConfigs.MOD_GEN.isValid(ModGenConfig.Type.STRUCTURES, world.getDimensionKey(), this.getStructure().getRegistryName())) {
 			ci.cancel();
 		}
 	}

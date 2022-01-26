@@ -28,7 +28,7 @@ mixin {
 def mc_version = "1.16.5"
 version = "${mc_version}-1"
 
-version = '1.0.0'
+version = '1.0.1'
 group = 'iskallia.vaultgen' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 
 archivesBaseName = 'vault_gen'

@@ -1,6 +1,7 @@
 package iskallia.vaultgen.mixin;
 
 import iskallia.vaultgen.IDimContext;
+import iskallia.vaultgen.config.ModGenConfig;
 import iskallia.vaultgen.init.ModConfigs;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.WeightedRandom;
@@ -24,12 +25,12 @@ import java.util.List;
 @Mixin(BiomeLayer.class)
 public class MixinBiomeLayer {
 
-	private static List<BiomeManager.BiomeEntry>[] VANILLA = setupVanilla();
+	private static final List<BiomeManager.BiomeEntry>[] VANILLA = setupVanilla();
 
 	@Shadow @Final private boolean legacyDesert;
 	@Shadow private List<BiomeManager.BiomeEntry>[] biomes;
 
-	@Inject(method = "getBiome", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getBiome", at = @At("HEAD"), cancellable = true, remap = false)
 	public void getBiome(BiomeManager.BiomeType type, INoiseRandom context, CallbackInfoReturnable<RegistryKey<Biome>> ci) {
 		if(type == BiomeManager.BiomeType.DESERT && this.legacyDesert) {
 			type = BiomeManager.BiomeType.DESERT_LEGACY;
@@ -40,11 +41,16 @@ public class MixinBiomeLayer {
 		if(dimension != null) {
 			List<BiomeManager.BiomeEntry> biomeList = new ArrayList<>(this.biomes[type.ordinal()]);
 			List<BiomeManager.BiomeEntry> vanillaList = VANILLA[type.ordinal()];
-			biomeList.removeIf(entry -> !ModConfigs.MOD_GEN.isValid(dimension.getLocation(), entry.getKey().getLocation()));
+			biomeList.removeIf(entry -> !ModConfigs.MOD_GEN.isValid(ModGenConfig.Type.BIOMES, dimension, entry.getKey().getLocation()));
 
 			int totalWeight = WeightedRandom.getTotalWeight(biomeList);
-			int weight = equals(vanillaList, biomeList) ? context.random(totalWeight / 10) * 10 : context.random(totalWeight);
-			ci.setReturnValue(WeightedRandom.getRandomItem(biomeList, weight).getKey());
+
+			if(totalWeight != 0) {
+				int weight = equals(vanillaList, biomeList) ? context.random(totalWeight / 10) * 10 : context.random(totalWeight);
+				ci.setReturnValue(WeightedRandom.getRandomItem(biomeList, weight).getKey());
+			} else {
+				ci.setReturnValue(Biomes.THE_VOID);
+			}
 		}
 	}
 
@@ -63,7 +69,7 @@ public class MixinBiomeLayer {
 	}
 
 	private static List<BiomeManager.BiomeEntry>[] setupVanilla() {
-		List<BiomeManager.BiomeEntry>[] biomes = new ArrayList[BiomeManager.BiomeType.values().length];
+		List<BiomeManager.BiomeEntry>[] biomes = new List[BiomeManager.BiomeType.values().length];
 
 		biomes[BiomeManager.BiomeType.DESERT_LEGACY.ordinal()] = Arrays.asList(
 			new BiomeManager.BiomeEntry(Biomes.DESERT, 10),
